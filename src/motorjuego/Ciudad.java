@@ -7,11 +7,8 @@ import java.util.ArrayList;
 
  Almacena el estado completo de la ciudad:
  Recursos: dinero, energía, agua, población, felicidad.
- Colección de edificios: ArrayList<Edificio> (requisito).
  Registro de eventos: ArrayList<String> (historial).
- 
- El motor del juego llama a construir() para añadir edificios y
- recorre la lista usando polimorfismo en cada ciclo mensual.
+
  */
 public class Ciudad {
 
@@ -22,7 +19,7 @@ public class Ciudad {
     private int    poblacion;     // población acumulada este mes
     private int    felicidad;     // 0–100
     private int    mes;
-
+    private final ArrayList<Edificio> edificios; // ESTA CLASE LA TIENE MARTA  CUANDO SE MERGE TIENE QUE SOLUCIONARSE
     //COLECCIONES (requisito: ArrayList)
    
     private final ArrayList<String>   registroEventos; // historial de la partida
@@ -34,11 +31,36 @@ public class Ciudad {
         this.felicidad       = 70; 
         this.mes             = 1;
         this.registroEventos = new ArrayList<>();
-        
+        this.edificios       = new ArrayList<>();   
     }
 
   
 
+    // ── Acción: Construir ─────────────────────────────────────────────
+    /**
+     * Añade un edificio al inventario descontando su costo.
+     * @throws FondosInsuficientesException si no hay dinero suficiente
+     */
+    public void construir(Edificio edificio) throws FondosInsuficientesException {
+        if (dinero < edificio.getCosto()) {
+            throw new FondosInsuficientesException(
+                "No tienes fondos suficientes para construir " + edificio.getNombre() +
+                ". Necesitas $" + String.format("%.0f", edificio.getCosto()) +
+                " | Disponible: $" + String.format("%.0f", dinero),
+                edificio.getCosto(), dinero
+            );
+        }
+        dinero -= edificio.getCosto();
+        edificios.add(edificio);
+        registroEventos.add("Mes " + mes + ": Construido " + edificio.getNombre());
+        System.out.println("    ✓ " + edificio.getNombre() +
+                           " construido. Costo: $" + String.format("%.0f", edificio.getCosto()));
+    }
+
+    
+
+    
+    
     // Metodos de acceso, mutacion de recursos
     
     public void addDinero(double cantidad)    { 
@@ -83,4 +105,7 @@ public class Ciudad {
     	return mes; }
     public ArrayList<String>  getRegistro(){ 
     	return registroEventos; }
+    public ArrayList<Edificio> getEdificios(){ 
+    	return edificios; }
+    
 }
