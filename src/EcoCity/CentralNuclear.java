@@ -58,6 +58,9 @@ public class CentralNuclear extends EdificioIndustrial implements Mantenimiento 
 	public String toString() {
 		return "Central Nuclear " + super.toString();
 	}
+
+
+
 	
 }
 
