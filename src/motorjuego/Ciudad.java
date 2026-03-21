@@ -2,16 +2,16 @@ package motorjuego;
 
 import java.util.ArrayList;
 
-/**
- * Ciudad
- * ──────
- * Almacena el estado completo de la ciudad:
- *   • Recursos: dinero, energía, agua, población, felicidad.
- *   • Colección de edificios: ArrayList<Edificio> (requisito).
- *   • Registro de eventos: ArrayList<String> (historial).
- *
- * El motor del juego llama a construir() para añadir edificios y
- * recorre la lista usando polimorfismo en cada ciclo mensual.
+/*
+  Ciudad
+
+ Almacena el estado completo de la ciudad:
+ Recursos: dinero, energía, agua, población, felicidad.
+ Colección de edificios: ArrayList<Edificio> (requisito).
+ Registro de eventos: ArrayList<String> (historial).
+ 
+ El motor del juego llama a construir() para añadir edificios y
+ recorre la lista usando polimorfismo en cada ciclo mensual.
  */
 public class Ciudad {
 
@@ -23,15 +23,15 @@ public class Ciudad {
     private int    felicidad;     // 0–100
     private int    mes;
 
-    // ── COLECCIONES (requisito: ArrayList) ────────────────────────────
+    //COLECCIONES (requisito: ArrayList)
    
     private final ArrayList<String>   registroEventos; // historial de la partida
 
-    // ── Constructor ───────────────────────────────────────────────────
+    // Constructor 
     public Ciudad(String nombre, double dineroInicial) {
         this.nombre          = nombre;
         this.dinero          = dineroInicial;
-        this.felicidad       = 70; // ciudad nueva, neutral-positiva
+        this.felicidad       = 70; 
         this.mes             = 1;
         this.registroEventos = new ArrayList<>();
         
@@ -39,7 +39,8 @@ public class Ciudad {
 
   
 
-    // ── Métodos de acceso / mutación de recursos ──────────────────────
+    // Metodos de acceso, mutacion de recursos
+    
     public void addDinero(double cantidad)    { 
     	this.dinero += cantidad; }
     public void addEnergia(double cantidad)   { 
@@ -56,7 +57,8 @@ public class Ciudad {
     public void incrementarMes()         { 
     	mes++; }
 
-    /** Reinicia los contadores de flujo al inicio de cada mes nuevo. */
+    // Reinicia los contadores de flujo al inicio de cada mes nuevo. 
+    
     public void resetRecursosMensuales() {
         this.energia     = 0;
         this.poblacion   = 0;
@@ -64,7 +66,7 @@ public class Ciudad {
         // felicidad y dinero persisten entre meses
     }
 
-    // ── Getters ───────────────────────────────────────────────────────
+    //Getters
     public String getNombre(){
     	return nombre; }
     public double getDinero(){ 
