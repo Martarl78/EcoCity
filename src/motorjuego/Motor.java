@@ -2,16 +2,7 @@ import java.util.ArrayList;
 import java.util.Random;
 import java.util.Scanner;
 
-/**
- * Motor
- * ─────
- * Corazón del juego. Gestiona:
- *   • El bucle principal de juego.
- *   • El ciclo mensual (polimorfismo sobre List<Edificio>).
- *   • Menús interactivos por consola.
- *   • Eventos aleatorios climáticos.
- *   • Condiciones de victoria/derrota.
- */
+
 public class Motor {
 
     private final Ciudad  ciudad;
@@ -60,6 +51,11 @@ public class Motor {
         System.out.println("  la felicidad de tus ciudadanos caerá!\n");
         pausar();
     }
+    
+    private void pausar() {
+        System.out.print("Presiona ENTER para comenzar...");
+        scanner.nextLine();
+    }
   
     private void mostrarEstado() {
         System.out.println("\n  -----||| ESTADO DE " + ciudad.getNombre().toUpperCase() +" – MES " + ciudad.getMes() + "|||-----");
@@ -100,7 +96,7 @@ public class Motor {
     }
     
     private void menuConstruir() {
-        System.out.println("══════════ CATÁLOGO DE CONSTRUCCIÓN ══════════");
+        System.out.println("======== CATÁLOGO DE CONSTRUCCIÓN ========");
 
         // Mostrar edificios
         for (int i = 0; i < CATALOGO.length; i++) {
@@ -153,6 +149,122 @@ public class Motor {
             case 7: return new EdificioComercial("Centro Comercial", 5_000, 15, 10,  500);
             case 8: return new EdificioComercial("Gran Mall",         8_000, 25, 20, 1200);
             default: return null;
+        }
+    }
+    private void menuReparar() {
+        ArrayList<Edificio> lista = ciudad.getEdificios();
+
+        // 1. Verificar si hay edificios
+        if (lista.isEmpty()) {
+            System.out.println("  No hay edificios para reparar.");
+            return;
+        }
+
+        // 2. Mostrar menú
+        System.out.println("========== SELECCIONA UN EDIFICIO PARA REPARAR ==========");
+        for (int i = 0; i < lista.size(); i++) {
+            System.out.println("  " + (i + 1) + ". " + lista.get(i));
+        }
+        System.out.println("  " + (lista.size() + 1) + ". Cancelar");
+        System.out.print("Elige un edificio: ");
+
+        // 3. Leer opción del usuario
+        String entrada = scanner.nextLine().trim();
+        int opcion;
+        try {
+            opcion = Integer.parseInt(entrada);
+        } catch (NumberFormatException e) {
+            System.out.println("  Ingresa un número válido.");
+            return;
+        }
+
+        // 4. Cancelar o validar opción
+        if (opcion == lista.size() + 1) {
+            System.out.println("  Reparación cancelada.");
+            return;
+        }
+        if (opcion < 1 || opcion > lista.size()) {
+            System.out.println("  Opción inválida.");
+            return;
+        }
+
+        // 5. Intentar reparar
+        Edificio elegido = lista.get(opcion - 1);
+        if (elegido instanceof Mantenible) {
+            try {
+                ((Mantenible) elegido).reparar(ciudad);
+            } catch (FondosInsuficientesException e) {
+                System.out.println("  X " + e.getMessage());
+            }
+        } else {
+            System.out.println("  Este edificio no puede ser reparado.");
+        }
+    }
+    
+    // ── Ciclo Mensual ─────────────────────────────────────────────────
+    private void pasarMes() {
+        System.out.println("========== PROCESANDO MES " + ciudad.getMes() + "==========");
+        ciudad.resetRecursosMensuales();
+
+        ArrayList<Edificio> lista     = ciudad.getEdificios();
+        ArrayList<Edificio> destruidos = new ArrayList<>();
+
+        // POLIMORFISMO: iteramos List<Edificio> sin conocer el tipo real
+        for (Edificio edificio : lista) {
+            System.out.println("  ---> " + edificio.getNombre() + ":");
+
+            // Restar consumo energético de cada edificio
+            ciudad.addEnergia(-edificio.getConsumoEnergia());
+
+            try {
+                edificio.aplicarEfectoMensual(ciudad);
+            } catch (ExplosionNuclearException e) {
+                System.out.println("  " + e.getMessage());
+                System.out.println("  ¡La ciudad paga $20,000 en limpieza y sufre -50 felicidad!");
+                destruidos.add(edificio);
+                ciudad.addFelicidad(-50);
+                ciudad.addDinero(-20_000);
+                ciudad.addEvento("Mes " + ciudad.getMes() + ": EXPLOSIÓN en " + e.getNombreCentral());
+            }
+        }
+
+        lista.removeAll(destruidos); // eliminar centrales destruidas
+
+        // Balance energético
+        verificarBalanceEnergia();
+
+        // Evento aleatorio
+        lanzarEventoAleatorio();
+
+        ciudad.incrementarMes();
+        System.out.println("==================================================");
+
+        verificarCondicionDerrota();
+    }
+    
+    
+    private void verificarBalanceEnergia() {
+        double energia = ciudad.getEnergia();
+        int energiaEntera = (int) energia; // redondea hacia abajo, quita decimales
+
+        if (energia < 0) {
+            System.out.println("\n  !! Balance energético: " + energiaEntera + " MW (¡DÉFICIT!)");
+            System.out.println("  Hay apagones. La felicidad cae -10.");
+            ciudad.addFelicidad(-10);
+        } else {
+            System.out.println("\n  !! Balance energético: +" + energiaEntera + " MW  ✓");
+        }
+    }
+    
+
+    private void verificarCondicionDerrota() {
+        if (ciudad.getFelicidad() <= 0) {
+            System.out.println("\n X GAME OVER: Felicidad en 0. Los ciudadanos abandonaron la ciudad.");
+            jugando = false;
+        }
+        if (ciudad.getDinero() < 0) {
+            System.out.println("\n X GAME OVER: La ciudad está en bancarrota. ¡Has perdido!");
+            jugando = false;
         }
     }
 
