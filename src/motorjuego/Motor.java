@@ -57,24 +57,26 @@ public class Motor {
         System.out.println("	  ECOCITY – SIMULADOR 2025   ");
         System.out.println("Construye, gestiona y cuida tu ciudad  ");
         System.out.println("\nConsejo: ¡Equilibra la producción de energía o");
-        System.out.println("         la felicidad de tus ciudadanos caerá!\n");
+        System.out.println("  la felicidad de tus ciudadanos caerá!\n");
         pausar();
     }
 
     private void mostrarEstado() {
-        System.out.println("\n  -----||| ESTADO DE " + ciudad.getNombre().toUpperCase() +
-                           " – MES " + ciudad.getMes() + "|||-----");
+        System.out.println("\n  -----||| ESTADO DE " + ciudad.getNombre().toUpperCase() +" – MES " + ciudad.getMes() + "|||-----");
         System.out.println("Recursos: $" + ciudad.getDinero() + " | Energía: " + ciudad.getEnergia() + "MW" +" | Población: " + ciudad.getPoblacion());
         System.out.println("Felicidad: " + ciudad.getFelicidad() + "% " + barraFelicidad(ciudad.getFelicidad()));
 
         ArrayList<Edificio> lista = ciudad.getEdificios();
+
         System.out.println("Edificios construidos:");
+
         if (lista.isEmpty()) {
-            System.out.println("  (ninguno – ¡construye algo!)");
+            System.out.println("  (ninguno) -- Deberías Construir algo");
         } else {
-            for (int i = 0; i < lista.size(); i++) {
-                // POLIMORFISMO: llamamos toString() sin saber el tipo concreto
-                System.out.println("  " + (i + 1) + ". " + lista.get(i));
+            int i = 1;
+            for (Edificio e : lista) {
+                System.out.println(i + ". " + e);
+                i++;
             }
         }
     }
