@@ -60,7 +60,7 @@ public class Motor {
         System.out.println("  la felicidad de tus ciudadanos caerá!\n");
         pausar();
     }
-
+  
     private void mostrarEstado() {
         System.out.println("\n  -----||| ESTADO DE " + ciudad.getNombre().toUpperCase() +" – MES " + ciudad.getMes() + "|||-----");
         System.out.println("Recursos: $" + ciudad.getDinero() + " | Energía: " + ciudad.getEnergia() + "MW" +" | Población: " + ciudad.getPoblacion());
@@ -98,4 +98,63 @@ public class Motor {
                 System.out.println("  Opción no válida. Intente de nuevo.");
         }
     }
+    
+    private void menuConstruir() {
+        System.out.println("══════════ CATÁLOGO DE CONSTRUCCIÓN ══════════");
+
+        // Mostrar edificios
+        for (int i = 0; i < CATALOGO.length; i++) {
+            System.out.println((i + 1) + ". " + CATALOGO[i][0] + " (" + CATALOGO[i][1] + ") - " + CATALOGO[i][2]);
+        }
+        System.out.println((CATALOGO.length + 1) + ". Cancelar");
+
+        // Leer opción del usuario
+        System.out.print("Elige un edificio: ");
+        String entrada = scanner.nextLine().trim();
+
+        int opcion;
+        try {
+            opcion = Integer.parseInt(entrada);
+        } catch (NumberFormatException e) {
+            System.out.println("  Ingresa un número válido.");
+            return;
+        }
+
+        if (opcion == CATALOGO.length + 1) {
+            System.out.println("  Construcción cancelada.");
+            return;
+        }
+
+        if (opcion < 1 || opcion > CATALOGO.length) {
+            System.out.println("  Opción inválida.");
+            return;
+        }
+
+        // Crear y construir el edificio
+        Edificio nuevo = crearEdificio(opcion);
+        if (nuevo != null) {
+            try {
+                ciudad.construir(nuevo);
+            } catch (FondosInsuficientesException e) {
+                System.out.println("  ❌ " + e.getMessage());
+            }
+        }
+    }
+    
+     // CLASES DE COMPAÑEROS ME SIRVE CUANDO SE HAGA MERGE
+    private Edificio crearEdificio(int opcion) {
+        switch (opcion) {
+            case 1: return new EdificioResidencial("Casa Magna",           2_000, 20, 100);
+            case 2: return new EdificioResidencial("Bloque Residencial",   3_500, 35, 200);
+            case 3: return new EdificioResidencial("Complejo Habitacional",6_000, 60, 400);
+            case 4: return new CentralNuclear("Central Nuclear Alfa");
+            case 5: return new ParqueEolico("Central Eólica A");
+            case 6: return new ParqueEolico("Parque Eólico Norte");
+            case 7: return new EdificioComercial("Centro Comercial", 5_000, 15, 10,  500);
+            case 8: return new EdificioComercial("Gran Mall",         8_000, 25, 20, 1200);
+            default: return null;
+        }
+    }
+
+    
 }
